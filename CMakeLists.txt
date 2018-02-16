@@ -544,6 +544,10 @@ if(NOT pugixml_FOUND)
   add_subdirectory(Externals/pugixml)
 endif()
 
+if(ENABLE_METAL)
+  add_subdirectory(Externals/mtlpp EXCLUDE_FROM_ALL)
+endif()
+
 if(USE_SHARED_ENET)
   check_lib(ENET libenet enet enet/enet.h QUIET)
   include(CheckSymbolExists)
