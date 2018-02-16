@@ -26,6 +26,9 @@
 #ifndef __APPLE__
 #include "VideoBackends/Vulkan/VideoBackend.h"
 #endif
+#ifdef HAS_METAL_BACKEND
+#include "VideoBackends/Metal/VideoBackend.h"
+#endif
 
 #include "VideoCommon/AsyncRequests.h"
 #include "VideoCommon/BPStructs.h"
@@ -195,6 +198,9 @@ void VideoBackendBase::PopulateList()
 #endif
 #ifndef __APPLE__
   g_available_video_backends.push_back(std::make_unique<Vulkan::VideoBackend>());
+#endif
+#ifdef HAS_METAL_BACKEND
+  g_available_video_backends.push_back(std::make_unique<Metal::VideoBackend>());
 #endif
   g_available_video_backends.push_back(std::make_unique<SW::VideoSoftware>());
   g_available_video_backends.push_back(std::make_unique<Null::VideoBackend>());

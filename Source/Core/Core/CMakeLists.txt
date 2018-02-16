@@ -322,6 +322,9 @@ endif()
 if(NOT APPLE)
   target_link_libraries(core PUBLIC videovulkan)
 endif()
+if(ENABLE_METAL)
+  target_link_libraries(core PUBLIC videometal)
+endif()
 
 if(WIN32)
   target_sources(core PRIVATE
