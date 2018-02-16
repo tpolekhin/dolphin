@@ -7,3 +7,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   add_subdirectory(D3D)
 endif()
 
+if(APPLE)
+  add_subdirectory(Metal)
+endif()
+
