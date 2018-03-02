@@ -25,6 +25,8 @@
 #include "VideoCommon/GeometryShaderGen.h"
 #include "VideoCommon/PixelShaderGen.h"
 #include "VideoCommon/RenderState.h"
+#include "VideoCommon/TextureCacheBase.h"
+#include "VideoCommon/TextureConverterShaderGen.h"
 #include "VideoCommon/UberShaderPixel.h"
 #include "VideoCommon/UberShaderVertex.h"
 #include "VideoCommon/VertexShaderGen.h"
@@ -55,7 +57,17 @@ public:
 
   // Get utility shader header based on current config.
   std::string GetUtilityShaderHeader() const;
-
+  const NativeVertexFormat* GetUtilityVertexFormat() const { return m_utility_vertex_format.get(); }
+  const AbstractShader* GetScreenQuadVertexShader() const
+  {
+    return m_screen_quad_vertex_shader.get();
+  }
+  const AbstractShader* GetPassthroughVertexShader() const
+  {
+    return m_passthrough_vertex_shader.get();
+  }
+  const AbstractShader* GetClearPixelShader() const { return m_clear_pixel_shader.get(); }
+  const AbstractShader* GetBlitPixelShader() const { return m_blit_pixel_shader.get(); }
   // Accesses ShaderGen shader caches
   const AbstractPipeline* GetPipelineForUid(const GXPipelineUid& uid);
   const AbstractPipeline* GetUberPipelineForUid(const GXUberPipelineUid& uid);
@@ -63,6 +75,13 @@ public:
   // Accesses ShaderGen shader caches asynchronously.
   // The optional will be empty if this pipeline is now background compiling.
   std::optional<const AbstractPipeline*> GetPipelineForUidAsync(const GXPipelineUid& uid);
+
+  // Utility pipeline creation/access.
+  const AbstractPipeline*
+  GetEFBToTexturePipeline(const TextureConversionShaderGen::TCShaderUid& uid);
+  const AbstractPipeline* GetEFBToRAMPipeline(const EFBCopyParams& uid);
+  const AbstractPipeline* GetEFBClearPipeline(const EFBClearPipelineConfig& uid);
+  const AbstractPipeline* GetBlitPipeline(const BlitPipelineConfig& uid);
 
 private:
   void WaitForAsyncCompiler();
@@ -74,6 +93,8 @@ private:
   void InvalidateCachedPipelines();
   void ClearPipelineCaches();
   void QueueUberShaderPipelines();
+  void CreateUtilityVertexFormat();
+  bool CompileUtilityShaders();
 
   // GX shader compiler methods
   std::unique_ptr<AbstractShader> CompileVertexShader(const VertexShaderUid& uid) const;
@@ -127,6 +148,13 @@ private:
     COMPILE_PRIORITY_SHADERCACHE_PIPELINE = 300
   };
 
+  // Utility Pipeline Methods
+  std::unique_ptr<AbstractPipeline>
+  CreateEFBToTexturePipeline(const TextureConversionShaderGen::TCShaderUid& uid) const;
+  std::unique_ptr<AbstractPipeline> CreateEFBToRAMPipeline(const EFBCopyParams& uid) const;
+  std::unique_ptr<AbstractPipeline> CreateEFBClearPipeline(const EFBClearPipelineConfig& uid) const;
+  std::unique_ptr<AbstractPipeline> CreateBlitPipeline(const BlitPipelineConfig& uid) const;
+
   // Configuration bits.
   APIType m_api_type = APIType::Nothing;
   ShaderHostConfig m_host_config = {};
@@ -157,6 +185,19 @@ private:
   std::map<GXUberPipelineUid, std::pair<std::unique_ptr<AbstractPipeline>, bool>>
       m_gx_uber_pipeline_cache;
   File::IOFile m_gx_pipeline_uid_cache_file;
+
+  // Pipeline cache for various utility shaders
+  std::unique_ptr<NativeVertexFormat> m_utility_vertex_format;
+  std::unique_ptr<AbstractShader> m_screen_quad_vertex_shader;
+  std::unique_ptr<AbstractShader> m_passthrough_vertex_shader;
+  std::unique_ptr<AbstractShader> m_stereo_expand_geometry_shader;
+  std::unique_ptr<AbstractShader> m_clear_pixel_shader;
+  std::unique_ptr<AbstractShader> m_blit_pixel_shader;
+  std::map<TextureConversionShaderGen::TCShaderUid, std::unique_ptr<AbstractPipeline>>
+      m_efb_to_texture_pipelines;
+  std::map<EFBCopyParams, std::unique_ptr<AbstractPipeline>> m_efb_to_ram_pipelines;
+  std::map<EFBClearPipelineConfig, std::unique_ptr<AbstractPipeline>> m_efb_clear_pipelines;
+  std::map<BlitPipelineConfig, std::unique_ptr<AbstractPipeline>> m_blit_pipelines;
 };
 
 }  // namespace VideoCommon

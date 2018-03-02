@@ -101,4 +101,64 @@ struct SerializedGXPipelineUid
 };
 #pragma pack(pop)
 
+struct EFBClearPipelineConfig
+{
+  EFBClearPipelineConfig(bool color_enable_, bool alpha_enable_, bool depth_enable_)
+      : color_enable(color_enable_), alpha_enable(alpha_enable_), depth_enable(depth_enable_)
+  {
+  }
+
+  bool color_enable;
+  bool alpha_enable;
+  bool depth_enable;
+
+  bool operator<(const EFBClearPipelineConfig& rhs) const
+  {
+    return std::tie(color_enable, alpha_enable, depth_enable) <
+           std::tie(rhs.color_enable, rhs.alpha_enable, rhs.depth_enable);
+  }
+};
+struct BlitPipelineConfig
+{
+  BlitPipelineConfig(AbstractTextureFormat dst_format_, bool stereo_ = false)
+      : dst_format(dst_format_), stereo(stereo_)
+  {
+  }
+
+  AbstractTextureFormat dst_format;
+  bool stereo;
+
+  bool operator<(const BlitPipelineConfig& rhs) const
+  {
+    return std::tie(dst_format, stereo) < std::tie(rhs.dst_format, rhs.stereo);
+  }
+};
+
+struct UtilityVertex
+{
+  float position[4] = {};
+  float uv[3] = {};
+  u32 color = 0;
+
+  UtilityVertex() = default;
+  void SetPosition(float x = 0.0f, float y = 0.0f, float z = 0.0f, float w = 1.0f)
+  {
+    position[0] = x;
+    position[1] = y;
+    position[2] = z;
+    position[3] = w;
+  }
+  void SetTextureCoordinates(float u = 0.0f, float v = 0.0f, float layer = 0.0f)
+  {
+    uv[0] = u;
+    uv[1] = v;
+    uv[2] = layer;
+  }
+  void SetColor(u32 color_) { color = color_; }
+  void SetColorRGBA(u32 r = 0, u32 g = 0, u32 b = 0, u32 a = 255)
+  {
+    color = (r) | (g << 8) | (b << 16) | (a << 24);
+  }
+};
+
 }  // namespace VideoCommon
