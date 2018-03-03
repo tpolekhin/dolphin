@@ -72,7 +72,7 @@ static void WriteHeader(char*& p, APIType ApiType)
     WRITE(p, "SAMPLER_BINDING(9) uniform sampler2DArray samp0;\n");
     WRITE(p, "FRAGMENT_OUTPUT_LOCATION(0) out vec4 ocol0;\n");
   }
-  else if (ApiType == APIType::Vulkan)
+  else if (ApiType == APIType::Vulkan || ApiType == APIType::Metal)
   {
     WRITE(p, "UBO_BINDING(std140, 1) uniform PSBlock {\n");
     WRITE(p, "  int4 position;\n");
@@ -153,7 +153,7 @@ static void WriteSampleFunction(char*& p, const EFBCopyParams& params, APIType A
         WRITE(p, "(");
     }
 
-    if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan)
+    if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan || ApiType == APIType::Metal)
       WRITE(p, "texture(samp0, float3(");
     else
       WRITE(p, "Tex0.Sample(samp0, float3(");
@@ -215,7 +215,7 @@ static void WriteSwizzler(char*& p, const EFBCopyParams& params, EFBCopyFormat f
   WriteHeader(p, ApiType);
   WriteSampleFunction(p, params, ApiType);
 
-  if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan)
+  if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan || ApiType == APIType::Metal)
   {
     WRITE(p, "void main()\n");
     WRITE(p, "{\n"

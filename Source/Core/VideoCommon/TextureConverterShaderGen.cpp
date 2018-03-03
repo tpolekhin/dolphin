@@ -53,7 +53,7 @@ ShaderCode GenerateShader(APIType api_type, const UidData* uid_data)
               "out vec4 ocol0;\n"
               "void main(){\n");
   }
-  else if (api_type == APIType::Vulkan)
+  else if (api_type == APIType::Vulkan || api_type == APIType::Metal)
   {
     out.Write("UBO_BINDING(std140, 1) uniform PSBlock {\n"
               "  float3 filter_coefficients;\n"

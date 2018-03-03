@@ -376,6 +376,12 @@ void WritePixelShaderCommonHeader(ShaderCode& out, APIType ApiType, u32 num_texg
   {
     out.Write("SAMPLER_BINDING(0) uniform sampler2DArray samp[8];\n");
   }
+  else if (ApiType == APIType::Metal)
+  {
+    // The MSL generator in SPIRV-Cross currently does not emit arrays of textures.
+    for (int i = 0; i < 8; i++)
+      out.Write("SAMPLER_BINDING(%d) uniform sampler2DArray samp%d;\n", i, i);
+  }
   else  // D3D
   {
     // Declare samplers
@@ -385,7 +391,7 @@ void WritePixelShaderCommonHeader(ShaderCode& out, APIType ApiType, u32 num_texg
   }
   out.Write("\n");
 
-  if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan)
+  if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan || ApiType == APIType::Metal)
     out.Write("UBO_BINDING(std140, 1) uniform PSBlock {\n");
   else
     out.Write("cbuffer PSBlock : register(b0) {\n");
@@ -434,7 +440,7 @@ void WritePixelShaderCommonHeader(ShaderCode& out, APIType ApiType, u32 num_texg
   {
     out.Write("%s", s_lighting_struct);
 
-    if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan)
+    if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan || ApiType == APIType::Metal)
       out.Write("UBO_BINDING(std140, 2) uniform VSBlock {\n");
     else
       out.Write("cbuffer VSBlock : register(b1) {\n");
@@ -445,7 +451,7 @@ void WritePixelShaderCommonHeader(ShaderCode& out, APIType ApiType, u32 num_texg
 
   if (bounding_box)
   {
-    if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan)
+    if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan || ApiType == APIType::Metal)
     {
       out.Write("SSBO_BINDING(0) buffer BBox {\n"
                 "\tint bbox_left, bbox_right, bbox_top, bbox_bottom;\n"
@@ -530,7 +536,7 @@ ShaderCode GeneratePixelShaderCode(APIType ApiType, const ShaderHostConfig& host
     // ARB_image_load_store extension yet.
 
     // D3D11 also has a way to force the driver to enable early-z, so we're fine here.
-    if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan)
+    if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan || ApiType == APIType::Metal)
     {
       // This is a #define which signals whatever early-z method the driver supports.
       out.Write("FORCE_EARLY_Z; \n");
@@ -549,7 +555,7 @@ ShaderCode GeneratePixelShaderCode(APIType ApiType, const ShaderHostConfig& host
   const bool use_shader_blend =
       !use_dual_source && (uid_data->useDstAlpha && host_config.backend_shader_framebuffer_fetch);
 
-  if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan)
+  if (ApiType == APIType::OpenGL || ApiType == APIType::Vulkan || ApiType == APIType::Metal)
   {
     if (use_dual_source)
     {
@@ -588,7 +594,8 @@ ShaderCode GeneratePixelShaderCode(APIType ApiType, const ShaderHostConfig& host
       out.Write("#define depth gl_FragDepth\n");
 
     // We need to always use output blocks for Vulkan, but geometry shaders are also optional.
-    if (host_config.backend_geometry_shaders || ApiType == APIType::Vulkan)
+    if (host_config.backend_geometry_shaders || ApiType == APIType::Vulkan ||
+        ApiType == APIType::Metal)
     {
       out.Write("VARYING_LOCATION(0) in VertexData {\n");
       GenerateVSOutputMembers(out, ApiType, uid_data->genMode_numtexgens, per_pixel_lighting,
@@ -1245,6 +1252,11 @@ static void SampleTexture(ShaderCode& out, const char* texcoords, const char* te
     out.Write("iround(255.0 * Tex[%d].Sample(samp[%d], float3(%s.xy * " I_TEXDIMS
               "[%d].xy, %s))).%s;\n",
               texmap, texmap, texcoords, texmap, stereo ? "layer" : "0.0", texswap);
+  }
+  else if (ApiType == APIType::Metal)
+  {
+    out.Write("iround(255.0 * texture(samp%d, float3(%s.xy * " I_TEXDIMS "[%d].xy, %s))).%s;\n",
+              texmap, texcoords, texmap, stereo ? "layer" : "0.0", texswap);
   }
   else
   {
