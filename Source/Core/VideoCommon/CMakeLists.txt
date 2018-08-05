@@ -29,6 +29,7 @@ add_library(videocommon
   PixelShaderGen.cpp
   PixelShaderManager.cpp
   PostProcessing.cpp
+  RasterFont.cpp
   RenderBase.cpp
   RenderState.cpp
   ShaderCache.cpp
