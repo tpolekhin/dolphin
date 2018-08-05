@@ -72,10 +72,10 @@ static const char SHADER_HEADER[] = R"(
 #define gl_InstanceID gl_InstanceIndex
 
 // MSL doesn't define sign() for integer types.
-int sign(int x) { return x == 0 ? 0 : (x < 0 ? -1 : 1); }
-int2 sign(int2 x) { return int2(sign(x.x), sign(x.y)); }
-int3 sign(int3 x) { return int3(sign(x.x), sign(x.y), sign(x.z)); }
-int4 sign(int4 x) { return int4(sign(x.x), sign(x.y), sign(x.z), sign(x.w)); }
+//int sign(int x) { return x == 0 ? 0 : (x < 0 ? -1 : 1); }
+//int2 sign(int2 x) { return int2(sign(x.x), sign(x.y)); }
+//int3 sign(int3 x) { return int3(sign(x.x), sign(x.y), sign(x.z)); }
+//int4 sign(int4 x) { return int4(sign(x.x), sign(x.y), sign(x.z), sign(x.w)); }
 )";
 
 const char* GetStagePrefix(ShaderStage stage)

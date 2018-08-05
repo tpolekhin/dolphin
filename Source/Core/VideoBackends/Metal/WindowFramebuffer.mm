@@ -70,7 +70,7 @@ public:
     // Setting framebuffer only means we can't blit copy.
     [layer setFramebufferOnly:NO];
     [layer setFrame:[view frame]];
-    [view setWantsLayer:YES];
+    //[view setWantsLayer:YES];
     [view setLayer:layer];
     INFO_LOG(VIDEO, "Metal layer created");
     return layer;
