@@ -238,4 +238,21 @@ void VertexManager::vFlush()
   }
 }
 
+
+void VertexManager::UploadUtilityUniforms(const void* uniforms, u32 uniforms_size)
+{
+}
+
+void VertexManager::CommitBuffer(u32 num_vertices, u32 vertex_stride, u32 num_indices, u32* out_base_vertex, u32* out_base_index)
+{
+}
+
+void VertexManager::UploadConstants()
+{
+}
+
+void VertexManager::DrawCurrentBatch(u32 base_index, u32 num_indices, u32 base_vertex)
+{
+}
+
 }  // namespace Metal
