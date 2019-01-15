@@ -197,6 +197,12 @@ public:
 
   virtual std::unique_ptr<VideoCommon::AsyncShaderCompiler> CreateAsyncShaderCompiler();
 
+  // Drawing utility shaders.
+  virtual void DrawUtilityPipeline(const void* uniforms, u32 uniforms_size, const void* vertices,
+                                    u32 vertex_stride, u32 num_vertices)
+  {
+  }
+
   void ShowOSDMessage(OSDMessage message);
 
 protected:
