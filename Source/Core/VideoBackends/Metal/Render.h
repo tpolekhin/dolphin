@@ -20,6 +20,8 @@ public:
   Renderer(std::unique_ptr<MetalFramebuffer> backbuffer);
   ~Renderer() override;
 
+  bool IsHeadless() const override;
+
   static Renderer* GetInstance() { return static_cast<Renderer*>(g_renderer.get()); }
   bool Initialize() override;
   void Shutdown() override;
@@ -70,7 +72,7 @@ public:
   void RestoreAPIState() override;
 
   void DrawUtilityPipeline(const void* uniforms, u32 uniforms_size, const void* vertices,
-                           u32 vertex_stride, u32 num_vertices) override;
+                           u32 vertex_stride, u32 num_vertices);
 
 private:
   // Draws a clear quad to the current framebuffer.

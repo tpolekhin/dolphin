@@ -83,9 +83,9 @@ void VertexManager::PrepareDrawBuffers(u32 stride)
                                   mtlpp::IndexType::UInt16);
 }
 
-void VertexManager::ResetBuffer(u32 stride)
+void VertexManager::ResetBuffer(u32 vertex_stride, bool cull_all)
 {
-  if (m_cull_all)
+  if (cull_all)
   {
     // Not drawing on the gpu, so store in a heap buffer instead
     m_cur_buffer_pointer = m_base_buffer_pointer = m_cpu_vertex_buffer.data();
@@ -95,7 +95,7 @@ void VertexManager::ResetBuffer(u32 stride)
   }
 
   // Attempt to allocate from buffers
-  bool has_vbuffer_allocation = m_vertex_stream_buffer->ReserveMemory(MAXVBUFFERSIZE, stride);
+  bool has_vbuffer_allocation = m_vertex_stream_buffer->ReserveMemory(MAXVBUFFERSIZE, vertex_stride);
   bool has_ibuffer_allocation = m_index_stream_buffer->ReserveMemory(MAXIBUFFERSIZE, sizeof(u16));
   if (!has_vbuffer_allocation || !has_ibuffer_allocation)
   {
@@ -105,7 +105,7 @@ void VertexManager::ResetBuffer(u32 stride)
 
     // Attempt to allocate again, this may cause a fence wait
     if (!has_vbuffer_allocation)
-      has_vbuffer_allocation = m_vertex_stream_buffer->ReserveMemory(MAXVBUFFERSIZE, stride);
+      has_vbuffer_allocation = m_vertex_stream_buffer->ReserveMemory(MAXVBUFFERSIZE, vertex_stride);
     if (!has_ibuffer_allocation)
       has_ibuffer_allocation = m_index_stream_buffer->ReserveMemory(MAXIBUFFERSIZE, sizeof(u16));
 
@@ -122,7 +122,7 @@ void VertexManager::ResetBuffer(u32 stride)
 
   // Update base indices
   m_current_draw_base_vertex =
-      static_cast<u32>(m_vertex_stream_buffer->GetCurrentOffset() / stride);
+      static_cast<u32>(m_vertex_stream_buffer->GetCurrentOffset() / vertex_stride);
   m_current_draw_index_offset = m_index_stream_buffer->GetCurrentOffset();
 }
 

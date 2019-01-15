@@ -11,11 +11,12 @@ namespace Metal
 class VideoBackend : public VideoBackendBase
 {
 public:
-  bool Initialize(void* window_handle) override;
+  bool Initialize(const WindowSystemInfo& wsi) override;
   void Shutdown() override;
 
   std::string GetName() const override { return "Metal"; }
   std::string GetDisplayName() const override { return "Metal"; }
   void InitBackendInfo() override;
+  void PrepareWindow(const WindowSystemInfo& wsi) override;
 };
 }  // namespace Metal

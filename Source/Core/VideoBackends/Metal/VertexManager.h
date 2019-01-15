@@ -33,12 +33,12 @@ public:
 
 protected:
   void PrepareDrawBuffers(u32 stride);
-  void ResetBuffer(u32 stride) override;
+  void ResetBuffer(u32 vertex_stride, bool cull_all) override;
 
 private:
   void UploadUniforms();
   void UploadAllUniforms();
-  void vFlush() override;
+  void vFlush();
 
   std::vector<u8> m_cpu_vertex_buffer;
   std::vector<u16> m_cpu_index_buffer;

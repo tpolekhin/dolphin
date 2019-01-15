@@ -37,6 +37,11 @@ Renderer::Renderer(std::unique_ptr<MetalFramebuffer> backbuffer)
 
 Renderer::~Renderer() = default;
 
+bool Renderer::IsHeadless() const
+{
+  return m_backbuffer == nullptr;
+}
+
 void Renderer::SubmitCommandBuffer(bool wait_for_completion)
 {
   g_state_tracker->EndRenderPass();

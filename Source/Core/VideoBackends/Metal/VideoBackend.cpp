@@ -18,6 +18,8 @@
 #include "VideoCommon/VideoCommon.h"
 #include "VideoCommon/VideoConfig.h"
 
+#include <objc/message.h>
+
 namespace Metal
 {
 void VideoBackend::InitBackendInfo()
@@ -27,7 +29,7 @@ void VideoBackend::InitBackendInfo()
   MetalContext::PopulateBackendInfoAdapters(&g_Config, gpu_list);
 }
 
-bool VideoBackend::Initialize(void* window_handle)
+bool VideoBackend::Initialize(const WindowSystemInfo& wsi)
 {
   // Populate BackendInfo with as much information as we can at this point.
   MetalContext::PopulateBackendInfo(&g_Config);
@@ -75,9 +77,9 @@ bool VideoBackend::Initialize(void* window_handle)
   }
 
   std::unique_ptr<MetalFramebuffer> backbuffer;
-  if (window_handle)
+  if (wsi.render_surface)
   {
-    backbuffer = MetalFramebuffer::CreateForWindow(window_handle, AbstractTextureFormat::BGRA8);
+    backbuffer = MetalFramebuffer::CreateForWindow(wsi.render_surface, AbstractTextureFormat::BGRA8);
     if (!backbuffer)
     {
       PanicAlert("Failed to create backbuffer.");
@@ -122,5 +124,32 @@ void VideoBackend::Shutdown()
   g_shader_cache.reset();
   g_state_tracker.reset();
   g_metal_context.reset();
+}
+
+void VideoBackend::PrepareWindow(const WindowSystemInfo& wsi)
+{
+  // This is kinda messy, but it avoids having to write Objective C++ just to create a metal layer.
+  id view = reinterpret_cast<id>(wsi.render_surface);
+  Class clsCAMetalLayer = objc_getClass("CAMetalLayer");
+  if (!clsCAMetalLayer)
+  {
+    ERROR_LOG(VIDEO, "Failed to get CAMetalLayer class.");
+    return;
+  }
+
+  // [CAMetalLayer layer]
+  id layer = reinterpret_cast<id (*)(Class, SEL)>(objc_msgSend)(objc_getClass("CAMetalLayer"),
+                                                                sel_getUid("layer"));
+  if (!layer)
+  {
+    ERROR_LOG(VIDEO, "Failed to create Metal layer.");
+    return;
+  }
+
+  // [view setWantsLayer:YES]
+  reinterpret_cast<void (*)(id, SEL, BOOL)>(objc_msgSend)(view, sel_getUid("setWantsLayer:"), YES);
+
+  // [view setLayer:layer]
+  reinterpret_cast<void (*)(id, SEL, id)>(objc_msgSend)(view, sel_getUid("setLayer:"), layer);
 }
 }  // namespace Metal
