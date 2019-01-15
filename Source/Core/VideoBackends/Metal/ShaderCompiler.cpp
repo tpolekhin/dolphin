@@ -381,7 +381,7 @@ bool TranslateSPVToMSL(std::string* out_msl, ShaderStage stage, const SPIRVCodeV
   spirv_cross::CompilerMSL::Options options;
   options.platform = spirv_cross::CompilerMSL::Options::macOS;
   options.set_msl_version(1, 3);
-  compiler.set_options(options);
+  compiler.set_msl_options(options);
 
   *out_msl = compiler.compile();
   if (out_msl->empty())
