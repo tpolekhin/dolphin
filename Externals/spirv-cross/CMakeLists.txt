@@ -6,7 +6,9 @@ set(SRCS
 	spirv_glsl.cpp
 	spirv_hlsl.cpp
 	spirv_msl.cpp
-  spirv_reflect.cpp
+	spirv_reflect.cpp
+	spirv_cross_parsed_ir.cpp
+	spirv_parser.cpp
 )
 
 if(NOT MSVC)
