@@ -189,13 +189,9 @@ void VideoBackendBase::PopulateList()
   g_available_video_backends.push_back(std::make_unique<DX11::VideoBackend>());
 #endif
   g_available_video_backends.push_back(std::make_unique<Vulkan::VideoBackend>());
-<<<<<<< HEAD
-=======
-#endif
 #ifdef HAS_METAL_BACKEND
   g_available_video_backends.push_back(std::make_unique<Metal::VideoBackend>());
 #endif
->>>>>>> 510ed09498... Add experimental Metal graphics backend
   g_available_video_backends.push_back(std::make_unique<SW::VideoSoftware>());
   g_available_video_backends.push_back(std::make_unique<Null::VideoBackend>());
 
