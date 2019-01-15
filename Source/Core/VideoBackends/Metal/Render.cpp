@@ -160,6 +160,17 @@ void Renderer::SetPipeline(const AbstractPipeline* pipeline)
   g_state_tracker->SetPipeline(static_cast<const MetalPipeline*>(pipeline));
 }
 
+void Renderer::RenderText(const std::string& text, int left, int top, u32 color)
+{
+  u32 backbuffer_width = m_backbuffer->GetWidth();
+  u32 backbuffer_height = m_backbuffer->GetHeight();
+
+  // m_raster_font->PrintMultiLineText(m_swap_chain_render_pass, text,
+  //                                   left * 2.0f / static_cast<float>(backbuffer_width) - 1,
+  //                                   1 - top * 2.0f / static_cast<float>(backbuffer_height),
+  //                                   backbuffer_width, backbuffer_height, color);
+}
+
 void Renderer::SetFramebuffer(const AbstractFramebuffer* framebuffer)
 {
   if (g_state_tracker->GetFramebuffer() == framebuffer)

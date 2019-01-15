@@ -55,6 +55,8 @@ public:
   void ClearScreen(const EFBRectangle& rc, bool colorEnable, bool alphaEnable, bool zEnable,
                    u32 color, u32 z) override;
 
+  void RenderText(const std::string& pstr, int left, int top, u32 color) override;
+
   void ReinterpretPixelData(unsigned int convtype) override {}
   void SetTexture(u32 index, const AbstractTexture* texture) override;
   void SetSamplerState(u32 index, const SamplerState& state) override;
@@ -72,7 +74,7 @@ public:
   void RestoreAPIState() override;
 
   void DrawUtilityPipeline(const void* uniforms, u32 uniforms_size, const void* vertices,
-                           u32 vertex_stride, u32 num_vertices);
+                           u32 vertex_stride, u32 num_vertices) override;
 
 private:
   // Draws a clear quad to the current framebuffer.
