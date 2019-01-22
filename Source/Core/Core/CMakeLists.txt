@@ -322,6 +322,10 @@ if(LIBUSB_FOUND)
   )
 endif()
 
+if(ENABLE_METAL)
+	target_link_libraries(core PUBLIC videometal)
+endif()
+
 if(WIN32)
   target_sources(core PRIVATE
     HW/EXI/BBA-TAP/TAP_Win32.cpp
